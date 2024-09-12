@@ -26,10 +26,9 @@ button input {
     margin-top: 20px;
 }
 
-/* Styl pro menší tlačítko "upravit" */
-.edit-btn {
-    font-size: 12px;
-    padding: 5px;
-    margin-left: 10px;
-    cursor: pointer;
+/* Styl pro tlačítko "upravit" */
+#editBtn {
+    margin-top: 10px;
+    padding: 10px;
+    width: 200px;
 }
