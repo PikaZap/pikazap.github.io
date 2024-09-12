@@ -20,6 +20,15 @@ document.getElementById('btnBylOdDo').addEventListener('click', function() {
     saveToCalendar(`Byl od ${from} do ${to}`);
 });
 
+// Zabraň kliknutí na vstupy spouštět tlačítko
+document.getElementById('fromTime').addEventListener('click', function(event) {
+    event.stopPropagation();
+});
+
+document.getElementById('toTime').addEventListener('click', function(event) {
+    event.stopPropagation();
+});
+
 // Zápis: nebyl
 document.getElementById('btnNebyl').addEventListener('click', function() {
     saveToCalendar('Nebyl');
