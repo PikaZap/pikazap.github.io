@@ -1,6 +1,7 @@
 // Uložení aktuálního dne
 const currentDate = new Date().toLocaleDateString();
 const calendar = document.getElementById('calendar');
+const editSection = document.getElementById('editSection');
 
 // Funkce pro uložení dat
 function saveToCalendar(status, date = currentDate) {
@@ -49,34 +50,34 @@ document.getElementById('toggleCalendar').addEventListener('click', function() {
     calendar.style.display = calendar.style.display === 'none' ? 'block' : 'none';
 });
 
-// Funkce pro úpravu existujícího záznamu
+// Funkce pro zobrazení úprav
 document.getElementById('editBtn').addEventListener('click', function() {
-    const dateToEdit = prompt("Zadej datum, které chceš upravit (např. 9/12/2024):");
-    if (dateToEdit && localStorage.getItem(dateToEdit)) {
-        const newStatus = prompt(`Uprav záznam pro ${dateToEdit}:`, localStorage.getItem(dateToEdit));
-        if (newStatus !== null) {
-            saveToCalendar(newStatus, dateToEdit);
-            alert(`Záznam pro ${dateToEdit} byl upraven.`);
-            location.reload();  // Znovu načte stránku, aby se aktualizoval kalendář
-        }
-    } else {
-        alert("Tento záznam neexistuje.");
-    }
-});
+    editSection.innerHTML = '';  // Vyprázdnění editovací sekce
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        const value = localStorage.getItem(key);
 
-// Kontrola zapomenutého zápisu
-window.addEventListener('load', function() {
-    if (!localStorage.getItem(currentDate)) {
-        saveToCalendar('Neznámé');
-        // Notifikace (není přímo podporováno pro telefon, ale prohlížeč na desktopu ano)
-        if (Notification.permission === 'granted') {
-            new Notification("Zapomněl jsi zapsat pracovní den!");
-        } else if (Notification.permission !== 'denied') {
-            Notification.requestPermission().then(permission => {
-                if (permission === 'granted') {
-                    new Notification("Zapomněl jsi zapsat pracovní den!");
-                }
-            });
-        }
-    }
-});
+        // Vytvoření prvku pro každý záznam
+        const entry = document.createElement('p');
+        entry.innerHTML = `${key}: ${value}`;
+
+        // Tlačítko pro změnu na "Byl"
+        const btnByl = document.createElement('button');
+        btnByl.textContent = 'Byl';
+        btnByl.addEventListener('click', function() {
+            saveToCalendar('Byl', key);
+            alert(`Záznam pro ${key} byl změněn na "Byl".`);
+        });
+
+        // Tlačítko pro změnu na "Byl od-do"
+        const btnBylOdDo = document.createElement('button');
+        btnBylOdDo.textContent = 'Byl od-do';
+        btnBylOdDo.addEventListener('click', function() {
+            const from = prompt('Zadej čas od:', '08:00');
+            const to = prompt('Zadej čas do:', '16:00');
+            saveToCalendar(`Byl od ${from} do ${to}`, key);
+            alert(`Záznam pro ${key} byl změněn.`);
+        });
+
+        // Tlačítko pro změnu na "Nebyl"
+        const
