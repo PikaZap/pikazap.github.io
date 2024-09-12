@@ -34,13 +34,28 @@ document.getElementById('btnNebyl').addEventListener('click', function() {
     saveToCalendar('Nebyl');
 });
 
-// Zobrazení kalendáře s tlačítkem "upravit"
+// Funkce pro zobrazení kalendáře
 document.getElementById('toggleCalendar').addEventListener('click', function() {
-    calendar.innerHTML = '';
+    calendar.innerHTML = '';  // Vyprázdnění kalendáře
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         const value = localStorage.getItem(key);
-        calendar.innerHTML += `<p>${key}: ${value} <button class="edit-btn" onclick="editEntry('${key}')">Upravit</button></p>`;
+
+        // Vytvoříme nový prvek pro každý záznam
+        const entry = document.createElement('p');
+        entry.innerHTML = `${key}: ${value}`;
+
+        // Vytvoření tlačítka "upravit"
+        const editBtn = document.createElement('button');
+        editBtn.innerText = 'Upravit';
+        editBtn.className = 'edit-btn';
+        editBtn.addEventListener('click', function() {
+            editEntry(key);
+        });
+
+        // Přidání záznamu a tlačítka do kalendáře
+        entry.appendChild(editBtn);
+        calendar.appendChild(entry);
     }
     calendar.style.display = calendar.style.display === 'none' ? 'block' : 'none';
 });
@@ -51,7 +66,7 @@ function editEntry(date) {
     if (newStatus !== null) {
         saveToCalendar(newStatus, date);
         alert(`Záznam pro ${date} byl upraven.`);
-        location.reload(); // Znovu načte stránku, aby se aktualizoval kalendář
+        location.reload();  // Aktualizace kalendáře
     }
 }
 
@@ -59,7 +74,7 @@ function editEntry(date) {
 window.addEventListener('load', function() {
     if (!localStorage.getItem(currentDate)) {
         saveToCalendar('Neznámé');
-        // Notifikace (není přímo podporováno pro telefon, ale prohlížeč na desktopu ano)
+        // Notifikace (pokud je povoleno)
         if (Notification.permission === 'granted') {
             new Notification("Zapomněl jsi zapsat pracovní den!");
         } else if (Notification.permission !== 'denied') {
