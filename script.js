@@ -41,40 +41,34 @@ document.getElementById('toggleCalendar').addEventListener('click', function() {
         const key = localStorage.key(i);
         const value = localStorage.getItem(key);
 
-        // Vytvoříme nový prvek pro každý záznam
+        // Přidání záznamů do kalendáře
         const entry = document.createElement('p');
         entry.innerHTML = `${key}: ${value}`;
-
-        // Vytvoření tlačítka "upravit"
-        const editBtn = document.createElement('button');
-        editBtn.innerText = 'Upravit';
-        editBtn.className = 'edit-btn';
-        editBtn.addEventListener('click', function() {
-            editEntry(key);
-        });
-
-        // Přidání záznamu a tlačítka do kalendáře
-        entry.appendChild(editBtn);
         calendar.appendChild(entry);
     }
     calendar.style.display = calendar.style.display === 'none' ? 'block' : 'none';
 });
 
-// Funkce pro úpravu záznamu
-function editEntry(date) {
-    const newStatus = prompt(`Uprav záznam pro ${date}:`, localStorage.getItem(date));
-    if (newStatus !== null) {
-        saveToCalendar(newStatus, date);
-        alert(`Záznam pro ${date} byl upraven.`);
-        location.reload();  // Aktualizace kalendáře
+// Funkce pro úpravu existujícího záznamu
+document.getElementById('editBtn').addEventListener('click', function() {
+    const dateToEdit = prompt("Zadej datum, které chceš upravit (např. 9/12/2024):");
+    if (dateToEdit && localStorage.getItem(dateToEdit)) {
+        const newStatus = prompt(`Uprav záznam pro ${dateToEdit}:`, localStorage.getItem(dateToEdit));
+        if (newStatus !== null) {
+            saveToCalendar(newStatus, dateToEdit);
+            alert(`Záznam pro ${dateToEdit} byl upraven.`);
+            location.reload();  // Znovu načte stránku, aby se aktualizoval kalendář
+        }
+    } else {
+        alert("Tento záznam neexistuje.");
     }
-}
+});
 
 // Kontrola zapomenutého zápisu
 window.addEventListener('load', function() {
     if (!localStorage.getItem(currentDate)) {
         saveToCalendar('Neznámé');
-        // Notifikace (pokud je povoleno)
+        // Notifikace (není přímo podporováno pro telefon, ale prohlížeč na desktopu ano)
         if (Notification.permission === 'granted') {
             new Notification("Zapomněl jsi zapsat pracovní den!");
         } else if (Notification.permission !== 'denied') {
