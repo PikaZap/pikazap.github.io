@@ -6,15 +6,22 @@ body {
 
 .container {
     display: flex;
+    flex-direction: column; /* Změní rozložení tlačítek na vertikální */
     gap: 10px;
     margin-bottom: 20px;
+}
+
+button {
+    padding: 10px;
+    width: 320px; /* Nastaví pevnou šířku tlačítek */
+    text-align: left; /* Zarovná text na levou stranu */
+}
+
+button input {
+    margin-left: 10px;
 }
 
 .calendar {
     display: none;
     margin-top: 20px;
-}
-
-button {
-    padding: 10px;
 }
