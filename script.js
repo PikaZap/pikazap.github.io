@@ -3,8 +3,8 @@ const currentDate = new Date().toLocaleDateString();
 const calendar = document.getElementById('calendar');
 
 // Funkce pro uložení dat
-function saveToCalendar(status) {
-    localStorage.setItem(currentDate, status);
+function saveToCalendar(status, date = currentDate) {
+    localStorage.setItem(date, status);
     alert("Zapsáno: " + status);
 }
 
@@ -34,16 +34,26 @@ document.getElementById('btnNebyl').addEventListener('click', function() {
     saveToCalendar('Nebyl');
 });
 
-// Zobrazení kalendáře
+// Zobrazení kalendáře s tlačítkem "upravit"
 document.getElementById('toggleCalendar').addEventListener('click', function() {
     calendar.innerHTML = '';
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         const value = localStorage.getItem(key);
-        calendar.innerHTML += `<p>${key}: ${value}</p>`;
+        calendar.innerHTML += `<p>${key}: ${value} <button class="edit-btn" onclick="editEntry('${key}')">Upravit</button></p>`;
     }
     calendar.style.display = calendar.style.display === 'none' ? 'block' : 'none';
 });
+
+// Funkce pro úpravu záznamu
+function editEntry(date) {
+    const newStatus = prompt(`Uprav záznam pro ${date}:`, localStorage.getItem(date));
+    if (newStatus !== null) {
+        saveToCalendar(newStatus, date);
+        alert(`Záznam pro ${date} byl upraven.`);
+        location.reload(); // Znovu načte stránku, aby se aktualizoval kalendář
+    }
+}
 
 // Kontrola zapomenutého zápisu
 window.addEventListener('load', function() {
