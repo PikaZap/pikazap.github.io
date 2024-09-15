@@ -1,78 +1,78 @@
-// Firebase konfigurace (tohle musíš mít ze své Firebase Console)
-const firebaseConfig = {
-    apiKey: "TVŮJ_API_KEY",
-    authDomain: "TVŮJ_PROJECT_ID.firebaseapp.com",
-    databaseURL: "https://TVŮJ_PROJECT_ID.firebaseio.com",
-    projectId: "TVŮJ_PROJECT_ID",
-    storageBucket: "TVŮJ_PROJECT_ID.appspot.com",
-    messagingSenderId: "TVŮJ_MESSAGING_SENDER_ID",
-    appId: "TVŮJ_APP_ID"
-};
+// Funkce pro uložení dat na serverless funkci
+async function saveToServer(date, status) {
+    try {
+        const response = await fetch('/api/pracovniDny', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ date, status }),
+        });
 
-// Inicializace Firebase
-firebase.initializeApp(firebaseConfig);
-
-// Připojení k databázi
-const database = firebase.database();
-
-const dbRef = database.ref("pracovni-dny");
-
-// Příklad zápisu dat
-document.getElementById('btnByl').addEventListener('click', function() {
-    const today = new Date().toLocaleDateString();
-    dbRef.child(today).set({
-        status: "Byl"
-    }).then(() => {
-        alert("Zápis úspěšný");
-    }).catch((error) => {
-        console.error("Chyba při zápisu: ", error);
-    });
-});
+        const data = await response.json();
+        alert(data.message);  // Zobrazí hlášku o úspěšném uložení
+    } catch (error) {
+        console.error("Chyba při ukládání: ", error);
+    }
+}
 
 // Zápis: byl
 document.getElementById('btnByl').addEventListener('click', function() {
-    saveToFirebase('Byl');
-});
-
-// Funkce pro formátování času na 24hodinový formát
-function formatTo24Hour(timeStr) {
-    const [hours, minutes] = timeStr.split(':');
-    return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
-}
-
-// Zápis: byl od-do
-document.getElementById('btnBylOdDo').addEventListener('click', function() {
-    const from = formatTo24Hour(document.getElementById('fromTime').value);
-    const to = formatTo24Hour(document.getElementById('toTime').value);
-    saveToFirebase(`Byl od ${from} do ${to}`);
+    const today = new Date().toLocaleDateString();
+    saveToServer(today, 'Byl');
 });
 
 // Zápis: nebyl
 document.getElementById('btnNebyl').addEventListener('click', function() {
-    saveToFirebase('Nebyl');
+    const today = new Date().toLocaleDateString();
+    saveToServer(today, 'Nebyl');
 });
 
-// Funkce pro načtení dat z Firebase
-document.getElementById('toggleCalendar').addEventListener('click', function() {
-    loadFromFirebase();  // Zavolání funkce pro načtení dat
+// Zápis: byl od-do
+document.getElementById('btnBylOdDo').addEventListener('click', function() {
+    const from = document.getElementById('fromTime').value;
+    const to = document.getElementById('toTime').value;
+    const today = new Date().toLocaleDateString();
+    saveToServer(today, `Byl od ${from} do ${to}`);
+});
+
+// Funkce pro načtení dat z serverless funkce
+document.getElementById('toggleCalendar').addEventListener('click', async function() {
+    try {
+        const response = await fetch('/api/pracovniDny');
+        const data = await response.json();
+        const calendar = document.getElementById('calendar');
+        calendar.innerHTML = '';  // Vyprázdnění kalendáře
+        
+        // Přidání záznamů do kalendáře
+        data.data.forEach(record => {
+            const entry = document.createElement('p');
+            entry.innerHTML = `${record.date}: ${record.status}`;
+            calendar.appendChild(entry);
+        });
+        calendar.style.display = calendar.style.display === 'none' ? 'block' : 'none';
+    } catch (error) {
+        console.error("Chyba při načítání dat:", error);
+    }
 });
 
 // Funkce pro zobrazení úprav
-document.getElementById('editBtn').addEventListener('click', function() {
-    const ref = database.ref('pracovni-dny');
-    ref.once('value', (snapshot) => {
-        const data = snapshot.val();
+document.getElementById('editBtn').addEventListener('click', async function() {
+    try {
+        const response = await fetch('/api/pracovniDny');
+        const data = await response.json();
         const editSection = document.getElementById('editSection');
         editSection.innerHTML = '';  // Vyprázdnění sekce
-        for (const [key, value] of Object.entries(data)) {
+        
+        data.data.forEach(record => {
             const entry = document.createElement('p');
-            entry.innerHTML = `${key}: ${value.status}`;
+            entry.innerHTML = `${record.date}: ${record.status}`;
             
             const btnByl = document.createElement('button');
             btnByl.textContent = 'Byl';
             btnByl.addEventListener('click', function() {
-                saveToFirebase('Byl', key);
-                alert(`Záznam pro ${key} byl změněn na "Byl".`);
+                saveToServer(record.date, 'Byl');
+                alert(`Záznam pro ${record.date} byl změněn na "Byl".`);
             });
 
             const btnBylOdDo = document.createElement('button');
@@ -80,26 +80,30 @@ document.getElementById('editBtn').addEventListener('click', function() {
             btnBylOdDo.addEventListener('click', function() {
                 const from = prompt('Zadej čas od (ve formátu HH:MM):', '08:00');
                 const to = prompt('Zadej čas do (ve formátu HH:MM):', '16:00');
-                const formattedFrom = formatTo24Hour(from);
-                const formattedTo = formatTo24Hour(to);
-                saveToFirebase(`Byl od ${formattedFrom} do ${formattedTo}`, key);
-                alert(`Záznam pro ${key} byl změněn.`);
+                saveToServer(record.date, `Byl od ${formatTo24Hour(from)} do ${formatTo24Hour(to)}`);
+                alert(`Záznam pro ${record.date} byl změněn.`);
             });
 
             const btnNebyl = document.createElement('button');
             btnNebyl.textContent = 'Nebyl';
             btnNebyl.addEventListener('click', function() {
-                saveToFirebase('Nebyl', key);
-                alert(`Záznam pro ${key} byl změněn na "Nebyl".`);
+                saveToServer(record.date, 'Nebyl');
+                alert(`Záznam pro ${record.date} byl změněn na "Nebyl".`);
             });
 
             entry.appendChild(btnByl);
             entry.appendChild(btnBylOdDo);
             entry.appendChild(btnNebyl);
             editSection.appendChild(entry);
-        }
+        });
         editSection.style.display = 'block';
-    }).catch(error => {
+    } catch (error) {
         console.error("Chyba při načítání dat:", error);
-    });
+    }
 });
+
+// Funkce pro formátování času na 24hodinový formát
+function formatTo24Hour(timeStr) {
+    const [hours, minutes] = timeStr.split(':');
+    return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
+}
