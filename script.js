@@ -1,20 +1,21 @@
-// Funkce pro uložení dat na serverless funkci
-async function saveToServer(date, status) {
-    try {
-        const response = await fetch('/api/pracovniDny', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ date, status }),
-        });
+document.addEventListener('DOMContentLoaded', function() {
+    // Funkce pro uložení dat na serverless funkci
+    async function saveToServer(date, status) {
+        try {
+            const response = await fetch('/api/pracovniDny', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ date, status }),
+            });
 
-        const data = await response.json();
-        alert(data.message);  // Zobrazí hlášku o úspěšném uložení
-    } catch (error) {
-        console.error("Chyba při ukládání: ", error);
+            const data = await response.json();
+            alert(data.message);  // Zobrazí hlášku o úspěšném uložení
+        } catch (error) {
+            console.error("Chyba při ukládání: ", error);
+        }
     }
-}
 
 // Zápis: byl
 document.getElementById('btnByl').addEventListener('click', function() {
