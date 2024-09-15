@@ -56,33 +56,36 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Zobrazení kalendáře
     document.getElementById('toggleCalendar').addEventListener('click', async function() {
-        try {
-            const response = await fetch('/api/pracovniDny');
-            
-            if (!response.ok) {
-                console.error(`HTTP error! Status: ${response.status}`);
-                const errorText = await response.text();
-                console.error(`Chyba při načítání dat: ${errorText}`);
-                alert(`Chyba při načítání dat: ${errorText}`);
-                return;
-            }
-            
-            const data = await response.json();
-            const calendar = document.getElementById('calendar');
-            calendar.innerHTML = '';  // Vyprázdnění kalendáře
-            
-            // Přidání záznamů do kalendáře
-            data.data.forEach(record => {
-                const entry = document.createElement('p');
-                entry.innerHTML = `${record.date}: ${record.status}`;
-                calendar.appendChild(entry);
-            });
-            calendar.style.display = calendar.style.display === 'none' ? 'block' : 'none';
-        } catch (error) {
-            console.error("Chyba při načítání dat:", error);
-            alert("Chyba při načítání dat.");
+    try {
+        const response = await fetch('/api/pracovniDny');
+        
+        if (!response.ok) {
+            console.error(`HTTP error! Status: ${response.status}`);
+            const errorText = await response.text();
+            console.error(`Chyba při načítání dat: ${errorText}`);
+            return;
         }
-    });
+        
+        const data = await response.json();
+        const calendar = document.getElementById('calendar');
+        calendar.innerHTML = '';  // Vyprázdnění kalendáře
+        
+        if (data.data.length === 0) {
+            calendar.innerHTML = '<p>Žádná data nejsou k dispozici.</p>';
+            return;
+        }
+
+        // Přidání záznamů do kalendáře
+        data.data.forEach(record => {
+            const entry = document.createElement('p');
+            entry.innerHTML = `${record.date}: ${record.status}`;
+            calendar.appendChild(entry);
+        });
+        calendar.style.display = calendar.style.display === 'none' ? 'block' : 'none';
+    } catch (error) {
+        console.error("Chyba při načítání dat:", error);
+    }
+});
 
     // Zobrazení úprav
     document.getElementById('editBtn').addEventListener('click', async function() {
