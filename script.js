@@ -37,6 +37,38 @@ document.getElementById('btnBylOdDo').addEventListener('click', function() {
     saveToServer(today, `Byl od ${from} do ${to}`);
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+    // Testovací funkce pro kliknutí na tlačítko
+    function showAlert(message) {
+        alert(message);
+    }
+
+    // Zápis: byl
+    document.getElementById('btnByl').addEventListener('click', function() {
+        showAlert('Tlačítko "Byl" bylo kliknuto');
+    });
+
+    // Zápis: nebyl
+    document.getElementById('btnNebyl').addEventListener('click', function() {
+        showAlert('Tlačítko "Nebyl" bylo kliknuto');
+    });
+
+    // Zápis: byl od-do
+    document.getElementById('btnBylOdDo').addEventListener('click', function() {
+        showAlert('Tlačítko "Byl od-do" bylo kliknuto');
+    });
+
+    // Zobrazení kalendáře
+    document.getElementById('toggleCalendar').addEventListener('click', function() {
+        showAlert('Tlačítko "Zobrazit kalendář" bylo kliknuto');
+    });
+
+    // Zobrazení úprav
+    document.getElementById('editBtn').addEventListener('click', function() {
+        showAlert('Tlačítko "Upravit záznamy" bylo kliknuto');
+    });
+});
+
 // Funkce pro načtení dat z serverless funkce
 document.getElementById('toggleCalendar').addEventListener('click', async function() {
     try {
