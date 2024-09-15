@@ -10,6 +10,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({ date, status }),
             });
 
+            if (!response.ok) {
+                console.error(`HTTP error! Status: ${response.status}`);
+                const errorText = await response.text();
+                console.error(`Chyba při ukládání: ${errorText}`);
+                return;
+            }
+
             const data = await response.json();
             alert(data.message);  // Zobrazí hlášku o úspěšném uložení
         } catch (error) {
@@ -49,6 +56,14 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('toggleCalendar').addEventListener('click', async function() {
         try {
             const response = await fetch('/api/pracovniDny');
+            
+            if (!response.ok) {
+                console.error(`HTTP error! Status: ${response.status}`);
+                const errorText = await response.text();
+                console.error(`Chyba při načítání dat: ${errorText}`);
+                return;
+            }
+            
             const data = await response.json();
             const calendar = document.getElementById('calendar');
             calendar.innerHTML = '';  // Vyprázdnění kalendáře
@@ -69,6 +84,14 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('editBtn').addEventListener('click', async function() {
         try {
             const response = await fetch('/api/pracovniDny');
+            
+            if (!response.ok) {
+                console.error(`HTTP error! Status: ${response.status}`);
+                const errorText = await response.text();
+                console.error(`Chyba při načítání dat: ${errorText}`);
+                return;
+            }
+            
             const data = await response.json();
             const editSection = document.getElementById('editSection');
             editSection.innerHTML = '';  // Vyprázdnění sekce
