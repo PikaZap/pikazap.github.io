@@ -1,40 +1,48 @@
-// Importování potřebných knihoven, např. pro připojení k databázi
-// const db = require('some-database-lib');
+import fs from 'fs';
+import path from 'path';
+
+// Soubor pro uložení dat
+const dataFilePath = path.join(process.cwd(), 'data', 'pracovniDny.json');
 
 export default async function handler(req, res) {
     if (req.method === 'POST') {
-        // Zpracování POST požadavku
         const { date, status } = req.body;
 
-        // Validace dat
         if (!date || !status) {
             return res.status(400).json({ message: 'Chybí datum nebo stav' });
         }
 
         try {
-            // Uložení dat do databáze nebo jiného úložiště
-            // await db.saveRecord({ date, status });
+            // Načíst existující data
+            let data = [];
+            if (fs.existsSync(dataFilePath)) {
+                data = JSON.parse(fs.readFileSync(dataFilePath, 'utf-8'));
+            }
 
-            // Odpověď s potvrzením
+            // Přidat nový záznam
+            data.push({ date, status });
+
+            // Uložit data do souboru
+            fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
+
             res.status(200).json({ message: 'Data uložena úspěšně' });
         } catch (error) {
             console.error("Chyba při ukládání dat:", error);
             res.status(500).json({ message: 'Interní chyba serveru' });
         }
     } else if (req.method === 'GET') {
-        // Zpracování GET požadavku
         try {
-            // Načtení dat z databáze nebo jiného úložiště
-            // const data = await db.getRecords();
+            let data = [];
+            if (fs.existsSync(dataFilePath)) {
+                data = JSON.parse(fs.readFileSync(dataFilePath, 'utf-8'));
+            }
 
-            // Odpověď s daty
-            res.status(200).json({ data: [] }); // Návrat prázdného pole pro ukázku
+            res.status(200).json({ data });
         } catch (error) {
             console.error("Chyba při načítání dat:", error);
             res.status(500).json({ message: 'Interní chyba serveru' });
         }
     } else {
-        // Nepodporovaný HTTP metoda
         res.setHeader('Allow', ['POST', 'GET']);
         res.status(405).end(`Metoda ${req.method} není povolena`);
     }
