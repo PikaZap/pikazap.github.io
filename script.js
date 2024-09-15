@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error(`HTTP error! Status: ${response.status}`);
                 const errorText = await response.text();
                 console.error(`Chyba při ukládání: ${errorText}`);
+                alert(`Chyba při ukládání: ${errorText}`);
                 return;
             }
 
@@ -21,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
             alert(data.message);  // Zobrazí hlášku o úspěšném uložení
         } catch (error) {
             console.error("Chyba při ukládání: ", error);
+            alert("Chyba při ukládání dat.");
         }
     }
 
@@ -61,6 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error(`HTTP error! Status: ${response.status}`);
                 const errorText = await response.text();
                 console.error(`Chyba při načítání dat: ${errorText}`);
+                alert(`Chyba při načítání dat: ${errorText}`);
                 return;
             }
             
@@ -77,6 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
             calendar.style.display = calendar.style.display === 'none' ? 'block' : 'none';
         } catch (error) {
             console.error("Chyba při načítání dat:", error);
+            alert("Chyba při načítání dat.");
         }
     });
 
@@ -89,6 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error(`HTTP error! Status: ${response.status}`);
                 const errorText = await response.text();
                 console.error(`Chyba při načítání dat: ${errorText}`);
+                alert(`Chyba při načítání dat: ${errorText}`);
                 return;
             }
             
@@ -131,6 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
             editSection.style.display = 'block';
         } catch (error) {
             console.error("Chyba při načítání dat:", error);
+            alert("Chyba při načítání dat.");
         }
     });
 
