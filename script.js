@@ -17,27 +17,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-// Zápis: byl
-document.getElementById('btnByl').addEventListener('click', function() {
-    const today = new Date().toLocaleDateString();
-    saveToServer(today, 'Byl');
-});
-
-// Zápis: nebyl
-document.getElementById('btnNebyl').addEventListener('click', function() {
-    const today = new Date().toLocaleDateString();
-    saveToServer(today, 'Nebyl');
-});
-
-// Zápis: byl od-do
-document.getElementById('btnBylOdDo').addEventListener('click', function() {
-    const from = document.getElementById('fromTime').value;
-    const to = document.getElementById('toTime').value;
-    const today = new Date().toLocaleDateString();
-    saveToServer(today, `Byl od ${from} do ${to}`);
-});
-
-document.addEventListener('DOMContentLoaded', function() {
     // Testovací funkce pro kliknutí na tlačítko
     function showAlert(message) {
         alert(message);
@@ -46,97 +25,95 @@ document.addEventListener('DOMContentLoaded', function() {
     // Zápis: byl
     document.getElementById('btnByl').addEventListener('click', function() {
         showAlert('Tlačítko "Byl" bylo kliknuto');
+        const today = new Date().toLocaleDateString();
+        saveToServer(today, 'Byl');
     });
 
     // Zápis: nebyl
     document.getElementById('btnNebyl').addEventListener('click', function() {
         showAlert('Tlačítko "Nebyl" bylo kliknuto');
+        const today = new Date().toLocaleDateString();
+        saveToServer(today, 'Nebyl');
     });
 
     // Zápis: byl od-do
     document.getElementById('btnBylOdDo').addEventListener('click', function() {
         showAlert('Tlačítko "Byl od-do" bylo kliknuto');
+        const from = document.getElementById('fromTime').value;
+        const to = document.getElementById('toTime').value;
+        const today = new Date().toLocaleDateString();
+        saveToServer(today, `Byl od ${from} do ${to}`);
     });
 
     // Zobrazení kalendáře
-    document.getElementById('toggleCalendar').addEventListener('click', function() {
-        showAlert('Tlačítko "Zobrazit kalendář" bylo kliknuto');
+    document.getElementById('toggleCalendar').addEventListener('click', async function() {
+        try {
+            const response = await fetch('/api/pracovniDny');
+            const data = await response.json();
+            const calendar = document.getElementById('calendar');
+            calendar.innerHTML = '';  // Vyprázdnění kalendáře
+            
+            // Přidání záznamů do kalendáře
+            data.data.forEach(record => {
+                const entry = document.createElement('p');
+                entry.innerHTML = `${record.date}: ${record.status}`;
+                calendar.appendChild(entry);
+            });
+            calendar.style.display = calendar.style.display === 'none' ? 'block' : 'none';
+        } catch (error) {
+            console.error("Chyba při načítání dat:", error);
+        }
     });
 
     // Zobrazení úprav
-    document.getElementById('editBtn').addEventListener('click', function() {
-        showAlert('Tlačítko "Upravit záznamy" bylo kliknuto');
-    });
-});
-
-// Funkce pro načtení dat z serverless funkce
-document.getElementById('toggleCalendar').addEventListener('click', async function() {
-    try {
-        const response = await fetch('/api/pracovniDny');
-        const data = await response.json();
-        const calendar = document.getElementById('calendar');
-        calendar.innerHTML = '';  // Vyprázdnění kalendáře
-        
-        // Přidání záznamů do kalendáře
-        data.data.forEach(record => {
-            const entry = document.createElement('p');
-            entry.innerHTML = `${record.date}: ${record.status}`;
-            calendar.appendChild(entry);
-        });
-        calendar.style.display = calendar.style.display === 'none' ? 'block' : 'none';
-    } catch (error) {
-        console.error("Chyba při načítání dat:", error);
-    }
-});
-
-// Funkce pro zobrazení úprav
-document.getElementById('editBtn').addEventListener('click', async function() {
-    try {
-        const response = await fetch('/api/pracovniDny');
-        const data = await response.json();
-        const editSection = document.getElementById('editSection');
-        editSection.innerHTML = '';  // Vyprázdnění sekce
-        
-        data.data.forEach(record => {
-            const entry = document.createElement('p');
-            entry.innerHTML = `${record.date}: ${record.status}`;
+    document.getElementById('editBtn').addEventListener('click', async function() {
+        try {
+            const response = await fetch('/api/pracovniDny');
+            const data = await response.json();
+            const editSection = document.getElementById('editSection');
+            editSection.innerHTML = '';  // Vyprázdnění sekce
             
-            const btnByl = document.createElement('button');
-            btnByl.textContent = 'Byl';
-            btnByl.addEventListener('click', function() {
-                saveToServer(record.date, 'Byl');
-                alert(`Záznam pro ${record.date} byl změněn na "Byl".`);
-            });
+            data.data.forEach(record => {
+                const entry = document.createElement('p');
+                entry.innerHTML = `${record.date}: ${record.status}`;
+                
+                const btnByl = document.createElement('button');
+                btnByl.textContent = 'Byl';
+                btnByl.addEventListener('click', function() {
+                    saveToServer(record.date, 'Byl');
+                    alert(`Záznam pro ${record.date} byl změněn na "Byl".`);
+                });
 
-            const btnBylOdDo = document.createElement('button');
-            btnBylOdDo.textContent = 'Byl od-do';
-            btnBylOdDo.addEventListener('click', function() {
-                const from = prompt('Zadej čas od (ve formátu HH:MM):', '08:00');
-                const to = prompt('Zadej čas do (ve formátu HH:MM):', '16:00');
-                saveToServer(record.date, `Byl od ${formatTo24Hour(from)} do ${formatTo24Hour(to)}`);
-                alert(`Záznam pro ${record.date} byl změněn.`);
-            });
+                const btnBylOdDo = document.createElement('button');
+                btnBylOdDo.textContent = 'Byl od-do';
+                btnBylOdDo.addEventListener('click', function() {
+                    const from = prompt('Zadej čas od (ve formátu HH:MM):', '08:00');
+                    const to = prompt('Zadej čas do (ve formátu HH:MM):', '16:00');
+                    saveToServer(record.date, `Byl od ${formatTo24Hour(from)} do ${formatTo24Hour(to)}`);
+                    alert(`Záznam pro ${record.date} byl změněn.`);
+                });
 
-            const btnNebyl = document.createElement('button');
-            btnNebyl.textContent = 'Nebyl';
-            btnNebyl.addEventListener('click', function() {
-                saveToServer(record.date, 'Nebyl');
-                alert(`Záznam pro ${record.date} byl změněn na "Nebyl".`);
-            });
+                const btnNebyl = document.createElement('button');
+                btnNebyl.textContent = 'Nebyl';
+                btnNebyl.addEventListener('click', function() {
+                    saveToServer(record.date, 'Nebyl');
+                    alert(`Záznam pro ${record.date} byl změněn na "Nebyl".`);
+                });
 
-            entry.appendChild(btnByl);
-            entry.appendChild(btnBylOdDo);
-            entry.appendChild(btnNebyl);
-            editSection.appendChild(entry);
-        });
-        editSection.style.display = 'block';
-    } catch (error) {
-        console.error("Chyba při načítání dat:", error);
+                entry.appendChild(btnByl);
+                entry.appendChild(btnBylOdDo);
+                entry.appendChild(btnNebyl);
+                editSection.appendChild(entry);
+            });
+            editSection.style.display = 'block';
+        } catch (error) {
+            console.error("Chyba při načítání dat:", error);
+        }
+    });
+
+    // Funkce pro formátování času na 24hodinový formát
+    function formatTo24Hour(timeStr) {
+        const [hours, minutes] = timeStr.split(':');
+        return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
     }
 });
-
-// Funkce pro formátování času na 24hodinový formát
-function formatTo24Hour(timeStr) {
-    const [hours, minutes] = timeStr.split(':');
-    return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
-}
