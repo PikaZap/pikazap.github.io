@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 
-// Soubor pro uložení dat
 const dataFilePath = path.join(process.cwd(), 'data', 'pracovniDny.json');
 
 export default async function handler(req, res) {
@@ -13,16 +12,13 @@ export default async function handler(req, res) {
         }
 
         try {
-            // Načíst existující data
             let data = [];
             if (fs.existsSync(dataFilePath)) {
                 data = JSON.parse(fs.readFileSync(dataFilePath, 'utf-8'));
             }
 
-            // Přidat nový záznam
             data.push({ date, status });
 
-            // Uložit data do souboru
             fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
 
             res.status(200).json({ message: 'Data uložena úspěšně' });
