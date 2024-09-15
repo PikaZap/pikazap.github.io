@@ -1,31 +1,33 @@
-// Firebase konfigurace
+// Firebase konfigurace (tohle musíš mít ze své Firebase Console)
 const firebaseConfig = {
-  apiKey: "TVŮJ_API_KEY",
-  authDomain: "p-dny-b6e30.firebaseapp.com",
-  databaseURL: "https://p-dny-b6e30-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "p-dny-b6e30",
-  storageBucket: "p-dny-b6e30.appspot.com",
-  messagingSenderId: "TVŮJ_MESSAGING_SENDER_ID",
-  appId: "TVŮJ_APP_ID"
+    apiKey: "TVŮJ_API_KEY",
+    authDomain: "TVŮJ_PROJECT_ID.firebaseapp.com",
+    databaseURL: "https://TVŮJ_PROJECT_ID.firebaseio.com",
+    projectId: "TVŮJ_PROJECT_ID",
+    storageBucket: "TVŮJ_PROJECT_ID.appspot.com",
+    messagingSenderId: "TVŮJ_MESSAGING_SENDER_ID",
+    appId: "TVŮJ_APP_ID"
 };
 
 // Inicializace Firebase
 firebase.initializeApp(firebaseConfig);
 
-// Připojení k Realtime Database
+// Připojení k databázi
 const database = firebase.database();
 
-// Funkce pro uložení dat do Firebase
-function saveToFirebase(status, date = new Date().toLocaleDateString()) {
-    const ref = database.ref('pracovni-dny/' + date);  // Odkaz na záznam pro konkrétní datum
-    ref.set({
-        status: status
+const dbRef = database.ref("pracovni-dny");
+
+// Příklad zápisu dat
+document.getElementById('btnByl').addEventListener('click', function() {
+    const today = new Date().toLocaleDateString();
+    dbRef.child(today).set({
+        status: "Byl"
     }).then(() => {
-        alert("Zapsáno do Firebase: " + status);
-    }).catch(error => {
-        console.error("Chyba při zápisu:", error);
+        alert("Zápis úspěšný");
+    }).catch((error) => {
+        console.error("Chyba při zápisu: ", error);
     });
-}
+});
 
 // Zápis: byl
 document.getElementById('btnByl').addEventListener('click', function() {
